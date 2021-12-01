@@ -21,6 +21,7 @@ class _BotCommands:
         self.LogCommand = 'log3'
         self.SpeedCommand = 'speedtest'
         self.CloneCommand = 'clone'
+        self.GdToTCommand = 'gdtot'
         self.CountCommand = 'count3'
         self.WatchCommand = 'wat2'
         self.ZipWatchCommand = 'zipwat2'
