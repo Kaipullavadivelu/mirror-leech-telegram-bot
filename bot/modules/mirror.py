@@ -86,10 +86,12 @@ class MirrorListener(listeners.MirrorListeners):
                 LOGGER.info(f'Zip: orig_path: {m_path}, zip_path: {path}')
                 if pswd is not None:
                     if self.isLeech and int(size) > TG_SPLIT_SIZE:
+                        path = m_path + "_zip"
                         subprocess.run(["7z", f"-v{TG_SPLIT_SIZE}b", "a", "-mx=0", f"-p{pswd}", path, m_path])
                     else:
                         subprocess.run(["7z", "a", "-mx=0", f"-p{pswd}", path, m_path])
                 elif self.isLeech and int(size) > TG_SPLIT_SIZE:
+                    path = m_path + "_zip"
                     subprocess.run(["7z", f"-v{TG_SPLIT_SIZE}b", "a", "-mx=0", path, m_path])
                 else:
                     subprocess.run(["7z", "a", "-mx=0", path, m_path])
@@ -250,13 +252,11 @@ class MirrorListener(listeners.MirrorListeners):
                 update_all_messages()
             return
         with download_dict_lock:
-            msg = f'𝗙𝗶𝗹𝗲 𝗡𝗮𝗺𝗲 : <code>{download_dict[self.uid].name()}</code>\n\n𝗦𝗶𝘇𝗲 : {size}'
+            msg = f'<b>𝗙𝗶𝗹𝗲 𝗡𝗮𝗺𝗲: </b><code>{download_dict[self.uid].name()}</code>\n\n<b>Size: </b>{size}'
+            msg += f'\n\n<b>𝗧𝘆𝗽𝗲: </b>{typ}'
             if os.path.isdir(f'{DOWNLOAD_DIR}/{self.uid}/{download_dict[self.uid].name()}'):
-                msg += '\n\n𝗧𝘆𝗽𝗲 : Folder'
-                msg += f'\n𝗦𝘂𝗯 𝗙𝗼𝗹𝗱𝗲𝗿𝘀 : {folders}'
-                msg += f'\n𝗙𝗶𝗹𝗲𝘀 :{files}'
-            else:
-                msg += f'\n\n𝗧𝘆𝗽𝗲 :{typ}'
+                msg += f'\n<b>𝗦𝘂𝗯 𝗙𝗼𝗹𝗱𝗲𝗿𝘀: </b>{folders}'
+                msg += f'\n<b>𝗙𝗶𝗹𝗲𝘀: </b>{files}'
             buttons = button_build.ButtonMaker()
             link = short_url(link)
             buttons.buildbutton("☁️ 𝗗𝗿𝗶𝘃𝗲 𝗟𝗶𝗻𝗸", link)
@@ -282,11 +282,12 @@ class MirrorListener(listeners.MirrorListeners):
             if BUTTON_SIX_NAME is not None and BUTTON_SIX_URL is not None:
                 buttons.buildbutton(f"{BUTTON_SIX_NAME}", f"{BUTTON_SIX_URL}")
             if self.message.from_user.username:
-                 uname = f"@{self.message.from_user.username}"
+                uname = f"@{self.message.from_user.username}"
             else:
                 uname = f'<a href="tg://user?id={self.message.from_user.id}">{self.message.from_user.first_name}</a>'
             if uname is not None:
-                msg += f'\n\n🙋🏻‍♂️ 𝗥𝗲𝗾𝘂𝗲𝘀𝘁𝗲𝗱 𝗕𝘆 :- {uname}\n\n<b>𝗠𝘂𝘀𝗶𝗰🎧 24/7</b> - <b><a href="https://t.me/MSPdiscussion?voicechat">Click Here</a></b>\n\n'
+                msg += f'\n\n🙋🏻‍♂️ 𝗥𝗲𝗾𝘂𝗲𝘀𝘁𝗲𝗱 𝗕𝘆 :- {uname}\n\n<b>𝗣𝗼𝘄𝗲𝗿𝗲𝗗 𝗕𝗬</b> - <b><a href="https://t.me/MSPbots">𝗠𝗦𝗣 𝗕𝗼𝘁𝘀</a></b>\n\n'
+            try:
             try:
                 fs_utils.clean_download(download_dict[self.uid].path())
             except FileNotFoundError:
@@ -386,12 +387,16 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
         except IndexError:
             pass
     LOGGER.info(link)
+    gdtot_link = bot_utils.is_gdtot_link(link)
     if not bot_utils.is_url(link) and not bot_utils.is_magnet(link) and not os.path.exists(link):
-        help_msg = "➧ 𝐒𝐞𝐧𝐝 𝐥𝐢𝐧𝐤 𝐜𝐨𝐦𝐦𝐚𝐧𝐝 𝐥𝐢𝐧𝐞 𝐨𝐫 𝐛𝐲 𝐫𝐞𝐩𝐥𝐲\n"
-        help_msg += "➧ <b>𝐄𝐱𝐚𝐦𝐩𝐥𝐞𝐬:</b> \n<code>/command</code> link |newname [ 𝚃𝙶 𝚏𝚒𝚕𝚎𝚜 𝚘𝚛 𝙳𝚒𝚛𝚎𝚌𝚝 𝙻𝚒𝚗𝚔𝚜 ] pswd: mypassword [ 𝚣𝚒𝚙/𝚞𝚗𝚣𝚒𝚙 ]"
-        help_msg += "\n➧ 𝐑𝐞𝐩𝐥𝐲𝐢𝐧𝐠 𝐭𝐨 𝐥𝐢𝐧𝐤: <code>/command</code> |newname [ 𝚃𝙶 𝚏𝚒𝚕𝚎𝚜 𝚘𝚛 𝙳𝚒𝚛𝚎𝚌𝚝 𝙻𝚒𝚗𝚔𝚜 ] pswd: mypassword [ 𝚣𝚒𝚙/𝚞𝚗𝚣𝚒𝚙 ]"
-        help_msg += "\n➧ 𝐃𝐢𝐫𝐞𝐜𝐭 𝐋𝐢𝐧𝐤𝐬 𝐀𝐮𝐭𝐡𝐨𝐫𝐢𝐳𝐚𝐭𝐢𝐨𝐧:  <code>/command</code> link |newname pswd: mypassword\nusername\npassword [ 𝚁𝚎𝚙𝚕𝚢𝚒𝚗𝚐 𝚝𝚘 𝙻𝚒𝚗𝚔 ]"
-        help_msg += "\n➧ 𝐒𝐞𝐥𝐞𝐜𝐭𝐢𝐨𝐧: <code>/qbcommand</code> 𝐬 𝐥𝐢𝐧𝐤 [ 𝚁𝚎𝚙𝚕𝚢𝚒𝚗𝚐 𝚝𝚘 𝙻𝚒𝚗𝚔 ]"
+        help_msg = "<b>Send link along with command line:</b>"
+        help_msg += "\n<code>/command</code> {link} |newname pswd: mypassword [𝚣𝚒𝚙/𝚞𝚗𝚣𝚒𝚙]"
+        help_msg += "\n\n<b>By replying to link or file:</b>"
+        help_msg += "\n<code>/command</code> |newname pswd: mypassword [𝚣𝚒𝚙/𝚞𝚗𝚣𝚒𝚙]"
+        help_msg += "\n\n<b>Direct link authorization:</b>"
+        help_msg += "\n<code>/command</code> {link} |newname pswd: mypassword\nusername\npassword"
+        help_msg += "\n\n<b>Qbittorrent selection:</b>"
+        help_msg += "\n<code>/qbcommand</code> <b>s</b> {link} or by replying to {file}"
         return sendMessage(help_msg, bot, update)
     elif bot_utils.is_url(link) and not bot_utils.is_magnet(link) and not os.path.exists(link) and isQbit:
         try:
@@ -403,21 +408,17 @@ def _mirror(bot, update, isZip=False, extract=False, isQbit=False, isLeech=False
             else:
                 sendMessage(f"ERROR: link got HTTP response: {resp.status_code}", bot, update)
                 return
-        except RequestException as e:
+        except Exception as e:
             LOGGER.error(str(e))
             return
     elif not os.path.exists(link) and not bot_utils.is_mega_link(link) and not bot_utils.is_gdrive_link(link) and not bot_utils.is_magnet(link):
         try:
-            gdtot_link = bot_utils.is_gdtot_link(link)
             link = direct_link_generator(link)
         except DirectDownloadLinkException as e:
             LOGGER.info(e)
-            if "ERROR:" in str(e):
-                sendMessage(str(e), bot, update)
-                return
-            if "Youtube" in str(e):
-                sendMessage(str(e), bot, update)
-                return
+            if "ERROR:" in str(e) or "Youtube" in str(e):
+                return sendMessage(str(e), bot, update)
+
 
     if bot_utils.is_gdrive_link(link):
         if not isZip and not extract and not isLeech:
