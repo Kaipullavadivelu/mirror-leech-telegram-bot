@@ -288,7 +288,6 @@ class MirrorListener(listeners.MirrorListeners):
             if uname is not None:
                 msg += f'\n\n🙋🏻‍♂️ 𝗥𝗲𝗾𝘂𝗲𝘀𝘁𝗲𝗱 𝗕𝘆 :- {uname}\n\n<b>𝗣𝗼𝘄𝗲𝗿𝗲𝗗 𝗕𝗬</b> - <b><a href="https://t.me/MSPbots">𝗠𝗦𝗣 𝗕𝗼𝘁𝘀</a></b>\n\n'
             try:
-            try:
                 fs_utils.clean_download(download_dict[self.uid].path())
             except FileNotFoundError:
                 pass
